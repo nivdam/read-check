@@ -19,7 +19,7 @@ export default async function handler(req: any, res: any) {
       contents: prompt,
     });
 
-    const jsonText = response.text; // Assuming result.text contains the JSON string
+    const jsonText = response.text;
 
     if (!jsonText) {
       throw new Error("Empty response from Gemini");
