@@ -32,7 +32,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
       
       {/* Questions Count */}
       <div className="space-y-3">
-        <label className="block text-lg font-medium text-gray-700">
+        <label
+          id="question-count-label"
+          htmlFor="question-count-slider"
+          className="block text-lg font-medium text-gray-700"
+        >
           מספר השאלות במבדק ({questionCount})
         </label>
         <input 
@@ -40,6 +44,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           min="1" 
           max="20" 
           value={questionCount} 
+          id="question-count-slider"
           onChange={(e) => setQuestionCount(parseInt(e.target.value))}
           className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
         />
@@ -48,6 +53,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           min="1"
           max="20"
           value={questionCount}
+          aria-labelledby="question-count-label"
           onChange={(e) => setQuestionCount(parseInt(e.target.value))}
           className="w-20 p-2 border border-gray-300 rounded-md text-center text-white"
         />
@@ -55,7 +61,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
       {/* Text Length */}
       <div className="space-y-3">
-        <label className="block text-lg font-medium text-gray-700">
+        <label
+          id="text-length-label"
+          htmlFor="text-length-slider"
+          className="block text-lg font-medium text-gray-700"
+        >
           אורך טקסט הקריאה ({textLength} שורות)
         </label>
         <p className="text-sm text-gray-500">עמוד מלא הוא בערך 40 שורות</p>
@@ -64,6 +74,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           min="2" 
           max="160" 
           value={textLength} 
+          id="text-length-slider"
           onChange={(e) => setTextLength(parseInt(e.target.value))}
           className="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
         />
@@ -72,6 +83,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           min="2"
           max="160"
           value={textLength}
+          aria-labelledby="text-length-label"
           onChange={(e) => setTextLength(parseInt(e.target.value))}
           className="w-20 p-2 border border-gray-300 rounded-md text-center text-white"
         />
@@ -79,13 +91,14 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
       {/* Topic Selection */}
       <div className="space-y-3">
-        <label className="block text-lg font-medium text-gray-700">
+        <label htmlFor="topic-input" className="block text-lg font-medium text-gray-700">
           נושא המבדק
         </label>
         <div className="flex gap-3">
           <input 
             type="text" 
             value={topic}
+            id="topic-input"
             onChange={(e) => setTopic(e.target.value)}
             placeholder="למשל: מיינקראפט, לגו, חלל..."
             className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
