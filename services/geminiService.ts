@@ -1,76 +1,25 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { QuizData, QuizSettings } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-const quizSchema = {
-  type: Type.OBJECT,
-  properties: {
-    title: { type: Type.STRING, description: "A creative title for the story in Hebrew." },
-    content: { type: Type.STRING, description: "The reading comprehension text in Hebrew." },
-    questions: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.INTEGER },
-          text: { type: Type.STRING, description: "The question text in Hebrew." },
-          options: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING, description: "Letter identifier: 'א', 'ב', 'ג', or 'ד'" },
-                text: { type: Type.STRING, description: "The answer text in Hebrew." }
-              },
-              required: ["id", "text"]
-            }
-          },
-          correctOptionIds: { 
-            type: Type.ARRAY, 
-            items: { type: Type.STRING },
-            description: "Array of correct option IDs (e.g., ['א']). If multiple correct, list all." 
-          },
-          explanation: { type: Type.STRING, description: "Explanation why the answer is correct in Hebrew." },
-          isMultipleChoice: { type: Type.BOOLEAN, description: "True if user must select multiple options." }
-        },
-        required: ["id", "text", "options", "correctOptionIds", "explanation", "isMultipleChoice"]
-      }
-    },
-    bonusContent: { type: Type.STRING, description: "Optional shorter text for bonus section." },
-    bonusQuestions: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          id: { type: Type.INTEGER },
-          text: { type: Type.STRING, description: "Open-ended question text in Hebrew." },
-          parentGuide: { type: Type.STRING, description: "Guide for parents on what a good answer includes." }
-        },
-        required: ["id", "text", "parentGuide"]
-      }
-    }
-  },
-  required: ["title", "content", "questions"]
-};
 
 export const suggestTopic = async (): Promise<string> => {
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: "Suggest a single, short topic (max 4 words) for a reading comprehension text suitable for a 4th-grade boy in Israel. Examples: 'Adventure in Minecraft', 'My Dog'. Return ONLY the Hebrew string.",
+    const res = await fetch("/api/suggest-topic", {
+      method: "POST",
     });
-    return response.text?.trim() || "הרפתקה בחלל";
-  } catch (error) {
-    console.error("Topic suggestion failed", error);
+
+    const data = await res.json();
+
+    return data.text?.trim() || "הרפתקה בחלל";
+  } catch {
     return "יום כיף בלונה פארק";
   }
 };
 
-export const generateQuiz = async (settings: QuizSettings): Promise<QuizData> => {
+export const generateQuiz = async (
+  settings: QuizSettings
+): Promise<QuizData> => {
   const prompt = `
     Create a reading comprehension test in Hebrew for a 4th-grade student.
-    Topic: ${settings.topic || 'General Interest'}.
+    Topic: ${settings.topic || "General Interest"}.
     Approximate text length: ${settings.textLength} lines.
     Number of multiple-choice questions: ${settings.questionCount}.
     Include Bonus Section: ${settings.includeBonus}.
@@ -90,17 +39,21 @@ export const generateQuiz = async (settings: QuizSettings): Promise<QuizData> =>
        - Provide a 'parentGuide' for checking the open answers.
   `;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: quizSchema,
-    }
+  const res = await fetch("/api/generate-quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
   });
 
-  const jsonText = response.text;
-  if (!jsonText) throw new Error("Failed to generate quiz");
-  
-  return JSON.parse(jsonText) as QuizData;
+  if (!res.ok) {
+    throw new Error("Failed to generate quiz");
+  }
+
+  const data = (await res.json()) as { text?: string };
+
+  if (!data.text) {
+    throw new Error("Failed to generate quiz (empty response)");
+  }
+
+  return JSON.parse(data.text) as QuizData;
 };

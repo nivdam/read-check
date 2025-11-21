@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(request: Request) {
+export default async function handler(request: Request): Promise<Response> {
   try {
     const { prompt } = await request.json();
 
