@@ -1,0 +1,5 @@
+{
+  "name": "ReadCheck - Hebrew",
+  "description": "An interactive, gamified reading comprehension app for 4th graders using Gemini AI to generate personalized content in Hebrew.",
+  "requestFramePermissions": []
+}
