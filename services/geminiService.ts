@@ -39,21 +39,26 @@ export const generateQuiz = async (
        - Provide a 'parentGuide' for checking the open answers.
   `;
 
-  const res = await fetch("/api/generate-quiz", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
-  });
+  try {
+    const response = await fetch("/api/generate-quiz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to generate quiz");
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data || !data.title) {
+      throw new Error("Invalid data received from server");
+    }
+
+    return data as QuizData;
+  } catch (error) {
+    console.error("Error in generateQuiz service:", error);
+    throw error;
   }
-
-  const data = (await res.json()) as { text?: string };
-
-  if (!data.text) {
-    throw new Error("Failed to generate quiz (empty response)");
-  }
-
-  return JSON.parse(data.text) as QuizData;
 };
