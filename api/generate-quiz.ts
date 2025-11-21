@@ -19,17 +19,19 @@ export default async function handler(req: any, res: any) {
       contents: prompt,
     });
 
-    const text = response.text;
+    const jsonText = response.text; // Assuming result.text contains the JSON string
 
-    if (!text) {
+    if (!jsonText) {
       throw new Error("Empty response from Gemini");
     }
 
-    return res.status(200).json({ text });
+    const quiz = JSON.parse(jsonText);
+
+    return res.status(200).json(quiz);
   } catch (error: any) {
     console.error("generate-quiz error:", error);
     return res.status(500).json({
-      error: "Failed to generate",
+      error: "Failed to generate quiz",
       detail: error?.message ?? String(error),
     });
   }
