@@ -57,7 +57,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           value={questionCount}
           aria-labelledby="question-count-label"
           onChange={(e) => setQuestionCount(parseInt(e.target.value))}
-          className="w-20 p-2 border border-gray-300 rounded-md text-center bg-gray-750 text-white"
+          className="w-20 p-2 border border-gray-300 rounded-md text-center bg-gray-700 text-white"
         />
       </div>
 
@@ -87,7 +87,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           value={textLength}
           aria-labelledby="text-length-label"
           onChange={(e) => setTextLength(parseInt(e.target.value))}
-          className="w-20 p-2 border border-gray-300 rounded-md text-center bg-gray-750 text-white"
+          className="w-20 p-2 border border-gray-300 rounded-md text-center bg-gray-700 text-white"
         />
       </div>
 
@@ -106,7 +106,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
             id="topic-input"
             onChange={(e) => setTopic(e.target.value)}
             placeholder="למשל: מיינקראפט, לגו, חלל..."
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-750 text-white"
+            className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-700 text-white"
           />
           <button
             onClick={handleSuggestTopic}
