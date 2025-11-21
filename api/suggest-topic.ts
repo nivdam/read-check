@@ -1,11 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(req, res) {
+export default async function handler(req: any, res: any) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
 
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error("Missing GEMINI_API_KEY");
+      console.error("❌ Missing GEMINI_API_KEY in environment");
+      return res
+        .status(500)
+        .json({ error: "GEMINI_API_KEY is missing on server" });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -15,9 +21,16 @@ export default async function handler(req, res) {
       "Suggest a short Hebrew topic (max 4 words) for a 4th grade reading comprehension test. Return ONLY the Hebrew text."
     );
 
-    res.status(200).json({ text: result.response.text() });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Failed to generate topic" });
+    const text = result.response.text();
+    console.log("✅ Gemini topic:", text);
+
+    return res.status(200).json({ text });
+  } catch (error: any) {
+    console.error("❌ suggest-topic error:", error);
+
+    return res.status(500).json({
+      error: "Failed to generate topic",
+      detail: error?.response?.data || error?.message || String(error),
+    });
   }
 }
