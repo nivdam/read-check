@@ -3,7 +3,6 @@ import { QuizData } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Define the response schema to ensure structured JSON output
 const quizSchema: Schema = {
   type: Type.OBJECT,
   properties: {
@@ -45,16 +44,15 @@ const quizSchema: Schema = {
           correctOptionIds: {
             type: Type.ARRAY,
             items: { type: Type.STRING },
-            description:
-              "Array of correct option IDs. If multiple correct, list all.",
+            description: "Array of correct option IDs.",
           },
           explanation: {
             type: Type.STRING,
-            description: "Explanation why the answer is correct in Hebrew.",
+            description: "Explanation in Hebrew.",
           },
           isMultipleChoice: {
             type: Type.BOOLEAN,
-            description: "True if user must select multiple options.",
+            description: "True if multiple options.",
           },
         },
         required: [
@@ -67,20 +65,14 @@ const quizSchema: Schema = {
         ],
       },
     },
-    bonusContent: {
-      type: Type.STRING,
-      description: "Optional shorter text for bonus section.",
-    },
+    bonusContent: { type: Type.STRING, description: "Optional bonus text." },
     bonusQuestions: {
       type: Type.ARRAY,
       items: {
         type: Type.OBJECT,
         properties: {
           id: { type: Type.INTEGER },
-          text: {
-            type: Type.STRING,
-            description: "Open-ended question text in Hebrew.",
-          },
+          text: { type: Type.STRING, description: "Question text." },
           parentGuide: { type: Type.STRING, description: "Guide for parents." },
         },
         required: ["id", "text", "parentGuide"],
@@ -90,7 +82,7 @@ const quizSchema: Schema = {
   required: ["title", "content", "questions"],
 };
 
-export default async function handler(req: any, res: any): Promise<QuizData> {
+export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -111,14 +103,17 @@ export default async function handler(req: any, res: any): Promise<QuizData> {
       },
     });
 
-    // Fixed: Added parentheses to invoke the function
     const jsonText = response.text;
 
     if (!jsonText) {
       throw new Error("Failed to generate quiz");
     }
 
-    return JSON.parse(jsonText) as QuizData;
+    const cleanJson = jsonText.replace(/```json|```/g, "").trim();
+
+    const quiz = JSON.parse(cleanJson) as QuizData;
+
+    return res.status(200).json(quiz);
   } catch (error: any) {
     console.error("generate-quiz error:", error);
     return res.status(500).json({
