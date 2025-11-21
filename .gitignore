@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Vercel local config
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor crap
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# IDEs
+.idea/
+*.iml
+
+# Cache
+.cache/
+vite.cache/
+*.tsbuildinfo
+
+# AI Studio generated temp files
+tmp/
+temp/
+
+# TypeScript output
+out/
