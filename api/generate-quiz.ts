@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { QuizData } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -89,44 +90,35 @@ const quizSchema: Schema = {
   required: ["title", "content", "questions"],
 };
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: any, res: any): Promise<QuizData> {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // Extract the prompt from the request body
     const { prompt } = req.body;
 
     if (!prompt || typeof prompt !== "string") {
       return res.status(400).json({ error: "Missing prompt" });
     }
 
-    // Generate content using the specific model requested
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: quizSchema, // Passing the schema here is crucial for JSON structure
+        responseSchema: quizSchema,
       },
     });
 
-    // Retrieve the text response
+    // Fixed: Added parentheses to invoke the function
     const jsonText = response.text;
 
     if (!jsonText) {
-      throw new Error("Empty response from Gemini");
+      throw new Error("Failed to generate quiz");
     }
 
-    // Clean up potential markdown formatting (e.g., ```json ... ```) just in case
-    const cleanJson = jsonText.replace(/```json|```/g, "").trim();
-
-    // Parse the JSON string to an object
-    const quiz = JSON.parse(cleanJson);
-
-    // Return the structured quiz data
-    return res.status(200).json(quiz);
+    return JSON.parse(jsonText) as QuizData;
   } catch (error: any) {
     console.error("generate-quiz error:", error);
     return res.status(500).json({
